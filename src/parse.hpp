@@ -6,6 +6,15 @@
 #include <string_view>
 
 
+inline bool is_numeric(std::string_view str)
+{
+    return std::all_of(str.begin(), str.end(), [](auto ch)
+    {
+        return std::isdigit(ch);
+    });
+}
+
+
 inline void getline_to_str(std::istream& in
                     , std::string& out
                     , std::string_view eol = "\n");

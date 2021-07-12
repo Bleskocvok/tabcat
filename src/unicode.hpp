@@ -7,6 +7,12 @@
 #include <string_view>
 
 
+inline void set_locale_all(const std::string& locale)
+{
+    std::setlocale(LC_ALL, locale.c_str());
+}
+
+
 inline size_t unicode_size(std::string_view str)
 {
     std::mbstate_t mb{};

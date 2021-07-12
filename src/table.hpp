@@ -45,7 +45,7 @@ struct column
 {
     std::vector<std::string> data{};
     size_t width{};
-    alignment align{};
+    alignment align = alignment::left;
     column_type type{};
 };
 
@@ -56,8 +56,22 @@ struct error
 };
 
 
-struct table
+class table
 {
+    template<typename Self, typename Func>
+    static void for_each_impl(Self self, Func func)
+    {
+        for (size_t r = 0; r < self.row_count(); r++)
+        {
+            for (size_t c = 0; c < self.column_count(); c++)     // haha c++
+            {
+                location loc{ c, r, c == 0, c == self.column_count() - 1 };
+                func(self.at(c, r), loc);
+            }
+        }
+    }
+
+public:
     std::vector<column> columns{};
 
     size_t row_count() const
@@ -153,17 +167,10 @@ struct table
     }
 
     template<typename Func>
-    void for_each_cell(Func func)
-    {
-        for (size_t r = 0; r < row_count(); r++)
-        {
-            for (size_t c = 0; c < column_count(); c++)     // haha c++
-            {
-                location loc{ c, r, c == 0, c == column_count() - 1 };
-                func(at(c, r), loc);
-            }
-        }
-    }
+    void for_each_cell(Func func) const { for_each_impl(*this, func); }
+
+    template<typename Func>
+    void for_each_cell(Func func)       { for_each_impl(*this, func); }
 
     void setup_width()
     {

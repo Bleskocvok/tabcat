@@ -1,11 +1,13 @@
 #pragma once
 
 #include <string_view>
+#include <cassert>
+#include <bitset>
 
 #include "table.hpp"
 
 
-enum class border_pos
+enum class border_pos : size_t
 {
     top, bot, left, right, header, del,
     COUNT   // this MUST be last; contains the number of possible enum values
@@ -33,16 +35,19 @@ struct print_style
                      space = " ";
     size_t spacing = 1;
 
-    struct
+    std::bitset<static_cast<size_t>(border_pos::COUNT)> disabled{ 0 };
+
+    bool is_disabled(border_pos b) const
     {
-        bool top    = false,
-             bot    = false,
-             left   = false,
-             right  = false,
-             del    = false,
-             header = false;
+        assert(b < border_pos::COUNT);
+        return disabled[static_cast<size_t>(b)];
     }
-    disable;
+
+    void disable(border_pos b)
+    {
+        assert(b < border_pos::COUNT);
+        disabled[static_cast<size_t>(b)] = 1;
+    }
 };
 
 
@@ -50,11 +55,19 @@ template<typename PrintOutput>
 struct printer
 {
     PrintOutput& out;
+    print_style style;
 
     printer(PrintOutput& out)
-        : out(out) {}
-
-    print_style style;
+        : out(out)
+    {
+        // TODO: remove this; it's for debugging
+        // style.disable(border_pos::top);
+        // style.disable(border_pos::bot);
+        style.disable(border_pos::left);
+        style.disable(border_pos::right);
+        style.disable(border_pos::header);
+        // style.disable(border_pos::del);
+    }
 
     template<typename T>
     void repeat(const T& t, size_t count) const
@@ -66,41 +79,59 @@ struct printer
     }
 
     void print_header(const table& tab
-                    , const print_style::border& bstyle
-                    , std::string_view eol) const
+                    , const print_style::border& bstyle) const
     {
-        out << bstyle.beg << bstyle.mid;
+        if (!style.is_disabled(border_pos::left))
+        {
+            out << bstyle.beg;
+            repeat(bstyle.mid, style.spacing);
+        }
+
         bool prefix = false;
         for (size_t i = 0; i < tab.column_count(); i++)
         {
             size_t width = tab.columns[i].width;
 
-            if (prefix)
-                out << bstyle.mid << bstyle.join << bstyle.mid;
-            else
-                prefix = true;
-
-            for (size_t i = 0; i < width; i++)
+            if (!prefix)
             {
-                out << bstyle.mid;
+                prefix = true;
             }
+            else if (style.is_disabled(border_pos::del))
+            {
+                repeat(bstyle.mid, style.spacing);
+            }
+            else
+            {
+                repeat(bstyle.mid, style.spacing);
+                out << bstyle.join;
+                repeat(bstyle.mid, style.spacing);
+            }
+
+            repeat(bstyle.mid, width);
         }
-        out << bstyle.mid << bstyle.end << eol;
+
+        if (!style.is_disabled(border_pos::right))
+        {
+            repeat(bstyle.mid, style.spacing);
+            out << bstyle.end;
+        }
+        out << style.eol;
     }
 
     void print(const table& tab) const
     {
-        top_border(tab);
+        print(border_pos::top, tab);
 
         auto print_cell = [&](auto str, location loc)
         {
             if (loc.first_col)
             {
-                left_border();
+                print(border_pos::left, tab);
             }
             else
             {
-                delimiter();
+                spacing();
+                print(border_pos::del, tab);
             }
 
             out << (is_numeric(str) ? std::right : std::left)
@@ -109,16 +140,18 @@ struct printer
 
             if (loc.last_col)
             {
-                right_border();
+                print(border_pos::right, tab);
                 out << style.eol;
             }
 
             if (loc.row == 0 && loc.last_col)
-                header_border(tab);
+            {
+                print(border_pos::header, tab);
+            }
         };
         tab.for_each_cell(print_cell);
 
-        bot_border(tab);
+        print(border_pos::bot, tab);
     }
 
     void spacing() const
@@ -126,56 +159,47 @@ struct printer
         repeat(style.space, style.spacing);
     }
 
-    // TODO: refactor *_border(...) functions using enums
-
-    void top_border(const table& tab) const
+    void print(border_pos border, const table& tab) const
     {
-        if (style.disable.top)
+        using b = border_pos;
+
+        assert(border < b::COUNT);
+
+        if (style.is_disabled(border))
             return;
 
-        print_header(tab, style.top, style.eol);
-    }
+        switch (border)
+        {
+            case b::top:
+                print_header(tab, style.top);
+                break;
 
-    void bot_border(const table& tab) const
-    {
-        if (style.disable.bot)
-            return;
+            case b::bot:
+                print_header(tab, style.bot);
+                break;
 
-        print_header(tab, style.bot, style.eol);
-    }
+            case b::left:
+                out << style.outer;
+                spacing();
+                break;
 
-    void header_border(const table& tab) const
-    {
-        if (style.disable.header)
-            return;
+            case b::right:
+                spacing();
+                out << style.outer;
+                break;
 
-        print_header(tab, style.mid, style.eol);
-    }
+            case b::header:
+                print_header(tab, style.mid);
+                break;
 
-    void left_border() const
-    {
-        if (style.disable.left)
-            return;
+            case b::del:
+                out << style.del;
+                spacing();
+                break;
 
-        out << style.outer;
-        spacing();
-    }
-
-    void delimiter() const
-    {
-        spacing();
-        if (style.disable.del)
-            return;
-        out << style.del;
-        spacing();
-    }
-
-    void right_border() const
-    {
-        if (style.disable.right)
-            return;
-
-        spacing();
-        out << style.outer;
+            default:
+                assert(false);
+                break;
+        }
     }
 };

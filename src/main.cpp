@@ -42,8 +42,7 @@ std::vector<std::string_view> get_arg_vec(int argc, char** argv)
 {
     std::vector<std::string_view> arg_vec;
     arg_vec.reserve(argc);
-    // start with 1, skip program name
-    for (int i = 1; i < argc; i++)
+    for (int i = 0; i < argc; i++)
     {
         arg_vec.push_back(argv[i]);
     }
@@ -62,29 +61,53 @@ void perform_app(std::vector<std::string_view> args)
     //
     // Setup arguments
     //
-    app.options.push_back(std::make_unique<disable_top>());
-    app.options.push_back(std::make_unique<test>());
+    app.options.push_back(std::make_unique<disable_border<border_pos::top>>());
+    app.options.push_back(std::make_unique<disable_border<border_pos::bot>>());
+    app.options.push_back(std::make_unique<disable_border<border_pos::left>>());
+    app.options.push_back(std::make_unique<disable_border<border_pos::right>>());
+    app.options.push_back(std::make_unique<disable_border<border_pos::header>>());
+    app.options.push_back(std::make_unique<disable_border<border_pos::del>>());
 
     using opttype = decltype(app.options)::value_type::element_type::argtype;
-    for (size_t i = 0; i < args.size(); i++)
+    using s = std::string;
+    // start with 1, skip program name
+    for (size_t i = 1; i < args.size(); i++)
     {
+        if (args[i].empty())
+            continue;
+
         for (auto& option : app.options)
         {
-            if (args[i] == option->symbol()
-                && option->type() == opttype::toggle)
-            {
-                (*option)(app);
-            }
-            else if (starts_with(args[i], option->string()))
-            {
-                switch (option->type())
-                {
-                    case opttype::enum_value:
-                        args[i].remove_prefix(option->string().length());
-                        (*option)(app, args[i]);
-                        break;
+            bool symbol = !option->symbol().empty()
+                            && args[i] == "-"s + s(option->symbol());
+            bool string = !option->string().empty()
+                            && starts_with(args[i], "--"s + s(option->string()));
 
-                    case opttype::next_arg_value:
+            if (string)
+            {
+                args[i].remove_prefix(option->string().length());
+            }
+
+            switch (option->type())
+            {
+                case opttype::toggle:
+                    if (symbol || string)
+                    {
+                        (*option)(app);
+                    }
+                    break;
+
+                case opttype::enum_value:
+                    if (string)
+                    {
+                        args[i].remove_prefix("="s.length());
+                        (*option)(app, args[i]);
+                    }
+                    break;
+
+                case opttype::next_arg_value:
+                    if (symbol || string)
+                    {
                         if (i == args.size())
                         {
                             throw std::runtime_error(
@@ -93,16 +116,8 @@ void perform_app(std::vector<std::string_view> args)
                         }
                         (*option)(app, args[i + 1]);
                         i++;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            else
-            {
-                throw std::runtime_error(
-                        "invalid argument"s + std::string(args[i]));
+                    }
+                    break;
             }
         }
     }

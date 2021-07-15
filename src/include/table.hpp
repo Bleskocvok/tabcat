@@ -9,7 +9,8 @@
 #include <string_view>
 
 #include "unicode.hpp"
-#include "parse.hpp"
+#include "utils.hpp"
+#include "parser.hpp"
 
 
 struct invalid_table : std::runtime_error
@@ -97,10 +98,10 @@ public:
         return columns[c].data[r];
     }
 
-    static table parse(std::istream& in)
+    static table parse(std::istream& in, parser parser)
     {
-        const auto del = std::string_view{ ";" };
-        const auto eol = std::string_view{ "\n" };
+        const auto del = parser.del;
+        const auto eol = parser.eol;
 
         using view = std::string_view;
 

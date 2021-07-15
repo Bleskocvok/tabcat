@@ -30,6 +30,9 @@ inline void parse_line(std::istream& in
 inline void trim(std::string& str);
 
 
+inline bool starts_with(std::string_view str, std::string_view prefix);
+
+
 template<typename CellFunc>
 void parse_line(std::istream& in
                 , std::string_view del
@@ -91,4 +94,10 @@ void getline_to_str(std::istream& in
         std::getline(in, l, eol.back());
         out += std::move(l);
     }
+}
+
+
+bool starts_with(std::string_view str, std::string_view prefix)
+{
+    return str.compare(0, prefix.size(), prefix) == 0;
 }

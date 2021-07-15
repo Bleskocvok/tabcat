@@ -16,3 +16,19 @@ inline std::string_view reset   = "\033[0m",
 
 
 } // namespace color
+
+
+// nice looking style below
+
+// if (loc.row % 2 == 0)
+// {
+//     // out << color::black;
+//     // out << "\033[48;2;232;194;882m";
+//     out << "\033[7;49;37m";
+// }
+// else
+// {
+//     // out << color::black;
+//     // out << "\033[48;2;168;137;502m";
+//     out << "\033[7;49;97m";
+// }

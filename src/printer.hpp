@@ -3,6 +3,7 @@
 #include <string_view>
 #include <cassert>
 #include <bitset>
+#include <functional>   // function
 
 #include "table.hpp"
 #include "terminal.hpp"
@@ -59,16 +60,7 @@ struct printer
     print_style style;
 
     printer(PrintOutput& out)
-        : out(out)
-    {
-        // TODO: remove this; it's for debugging
-        style.disable(border_pos::top);
-        style.disable(border_pos::bot);
-        // style.disable(border_pos::left);
-        // style.disable(border_pos::right);
-        // style.disable(border_pos::header);
-        // style.disable(border_pos::del);
-    }
+        : out(out) {}
 
     template<typename T>
     void repeat(const T& t, size_t count) const
@@ -125,17 +117,6 @@ struct printer
 
         auto print_cell = [&](auto str, location loc)
         {
-            if (loc.row % 2 == 0)
-            {
-                out << color::black;
-                out << "\033[48;2;232;194;882m";
-            }
-            else
-            {
-                out << color::black;
-                out << "\033[48;2;168;137;502m";
-            }
-
             if (loc.first_col)
             {
                 print(border_pos::left, tab);

@@ -2,13 +2,13 @@
 
 #include <istream>
 #include <string>       // getline
-#include <cctype>        // isspace
+#include <cctype>       // isspace
 #include <string_view>
 
 
 inline bool is_numeric(std::string_view str)
 {
-    return std::all_of(str.begin(), str.end(), [](auto ch)
+    return std::all_of(str.begin(), str.end(), [](unsigned char ch)
     {
         return std::isdigit(ch);
     });
@@ -69,7 +69,7 @@ void trim(std::string& str)
     size_t last;
     for (last = 0; last < str.length(); last++)
     {
-        if (!std::isspace(str[last]))
+        if (!std::isspace(static_cast<unsigned char>(str[last])))
         {
             break;
         }

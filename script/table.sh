@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-time g++ src/table.cpp -o table -std=c++17 -pedantic -Wall -Wextra
+time g++ src/main.cpp -o table -std=c++17 -pedantic -Wall -Wextra
 
 [ "$?" ] || exit 1
 

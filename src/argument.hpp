@@ -52,6 +52,9 @@ template<typename App>
 argument<App>* opt_by_symbol(const option_vec<App>& opts,
                              std::string_view sym)
 {
+    if (sym.empty())
+        return nullptr;
+
     return find_opt(opts, [=](const auto& opt){ return opt->symbol() == sym; });
 }
 
@@ -60,6 +63,9 @@ template<typename App>
 argument<App>* opt_by_string(const option_vec<App>& opts,
                              std::string_view str)
 {
+    if (str.empty())
+        return nullptr;
+
     return find_opt(opts, [=](const auto& opt){ return opt->string() == str; });
 }
 

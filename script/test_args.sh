@@ -1,31 +1,52 @@
 #!/usr/bin/env bash
 
 
-time g++ src/main.cpp -o table -std=c++17 -pedantic -Wall -Wextra
-
-[ "$?" ] || exit 1
+g++ src/main.cpp -o table -std=c++17 -pedantic -Wall -Wextra || exit 1
 
 B='\033[1m'
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+LGREY='\033[1;30m'
 NC='\033[0m'
+PASS_NOK='nok; expected PASS, but failed:\t\t'
+FAIL_NOK='nok; expected FAIL, but passed:\t\t'
+
+function ind() { sed "s/^/\t/g"; }
+
+function header()
+{
+    echo
+    echo -e "${NC}./table $@${LGREY}"
+    echo "" | ./table $@ 2>&1 | ind | head -n 3
+}
 
 function pass()
 {
-    ./table $@ || { echo -e "${RED}nok; expected PASS, but failed\t./table $@${NC}";
-                    exit 1; }
-    echo -e "${B}${GREEN}ok${NC}"
+    header $@
+    echo "" | ./table $@ &> /dev/null || {
+        echo -e "${RED}${PASS_NOK}./table $@${NC}" | ind;
+        exit 1;
+    }
+    echo -e "${B}${GREEN}ok${NC}" | ind
 }
 
 function fail()
 {
-    ./table $@ && { echo -e "${RED}nok; expected FAIL, but passed\t./table $@${NC}";
-                    exit 1; }
-    echo -e "${B}${GREEN}ok${NC}"
+    header $@
+    echo "" | ./table $@ &> /dev/null && {
+        echo -e "${RED}${FAIL_NOK}./table $@${NC}" | ind;
+        exit 1;
+    }
+    echo -e "${B}${GREEN}ok${NC}" | ind
 }
-
 
 pass --help
 fail --helpa
-pass -TBLR
+fail --
+fail -
+fail --help=ajo
+fail --help=
 fail --TBLR
+fail --delimiter
+pass --delimiter a
+pass -TBLR

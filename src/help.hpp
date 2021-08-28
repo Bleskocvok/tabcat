@@ -59,6 +59,11 @@ struct help : argument<app_settings>
                 str += "=PARAM";
             }
 
+            if (opt->type() == argument::argtype::next_arg_value)
+            {
+                str += " PARAM";
+            }
+
             out << std::setw(6) << symbol
                 << std::setw(22) << str << " "
                 << opt->description() << "\n";

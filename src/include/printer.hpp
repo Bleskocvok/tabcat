@@ -66,6 +66,24 @@ struct print_style
 
     std::bitset<static_cast<size_t>(border_pos::COUNT)> disabled{ 0 };
 
+    constexpr
+    print_style(border top,
+                border mid,
+                border bot,
+                std::string_view del,
+                std::string_view outer,
+                std::string_view eol = "\n",
+                std::string_view space = " ")
+        : top(top)
+        , mid(mid)
+        , bot(bot)
+        , del(del)
+        , outer(outer)
+        , eol(eol)
+        , space(space) {}
+
+    print_style() = default;
+
     bool is_disabled(border_pos b) const
     {
         assert(b < border_pos::COUNT);

@@ -105,12 +105,12 @@ inline std::optional<std::string> perform_args(
         }
         else
         {
-            return "invalid argument'"s + s(args[i]) + "'"s;
+            return "invalid argument '"s + s(args[i]) + "'"s;
         }
 
         if (!option)
         {
-            return "invalid argument'"s + s(args[i]) + "'"s;
+            return "invalid argument '"s + s(args[i]) + "'"s;
         }
 
         switch (option->type())
@@ -134,7 +134,8 @@ inline std::optional<std::string> perform_args(
             case opttype::next_arg_value:
                 if (i == args.size() - 1)
                 {
-                    return "expected value for argument '"s + s(args[i]) + "'"s;
+                    return "expected parameter for argument '"s
+                            + s(args[i]) + "'"s;
                 }
                 (*option)(app, args[i + 1]);
                 i++;

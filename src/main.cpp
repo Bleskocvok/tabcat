@@ -12,6 +12,9 @@
 #include "delimiter.hpp"
 #include "disable_border.hpp"
 #include "help.hpp"
+#include "version.hpp"
+#include "format.hpp"
+#include "locale.hpp"
 
 
 void perform_app(const std::vector<std::string_view>& args);
@@ -35,7 +38,7 @@ int main(int argc, char** argv)
     catch (std::exception& ex)
     {
         std::cerr << "Error: " << ex.what() << std::endl;
-        return 1;
+        return 2;
     }
 
     return 0;
@@ -67,6 +70,9 @@ void perform_app(const std::vector<std::string_view>& args)
 
     // parsing
     app.options.push_back(std::make_unique<delimiter>());
+    app.options.push_back(std::make_unique<locale>());
+    // output style
+    app.options.push_back(std::make_unique<format>());
     // borders disabling
     app.options.push_back(std::make_unique<disable_border<border_pos::top>>());
     app.options.push_back(std::make_unique<disable_border<border_pos::bot>>());
@@ -75,6 +81,7 @@ void perform_app(const std::vector<std::string_view>& args)
     app.options.push_back(std::make_unique<disable_border<border_pos::header>>());
     app.options.push_back(std::make_unique<disable_border<border_pos::del>>());
     // other
+    app.options.push_back(std::make_unique<version>());
     app.options.push_back(std::make_unique<help>());
 
     auto error = perform_args(args, app, app.options);

@@ -49,4 +49,6 @@ fail --help=
 fail --TBLR
 fail --delimiter
 pass --delimiter a
+pass --format=md
+fail --format=blablalbalblalbal
 pass -TBLR

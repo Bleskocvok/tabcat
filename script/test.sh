@@ -14,8 +14,8 @@ data=$({
         | tail -n +2
 })
 
-echo -e "\nDATA"
-echo "$data"
+# echo -e "\nDATA"
+# echo "$data"
 
-echo -e "\nTABLE"
+# echo -e "\nTABLE"
 echo "$data" | ./table "$@"

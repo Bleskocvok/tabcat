@@ -11,16 +11,7 @@
 #include "unicode.hpp"
 #include "utils.hpp"
 #include "parser.hpp"
-
-
-struct invalid_table : std::runtime_error
-{
-    explicit invalid_table(const std::string& str)
-        : std::runtime_error(str) {}
-
-    explicit invalid_table(const char* str)
-        : std::runtime_error(str) {}
-};
+#include "invalid_table.hpp"
 
 
 enum class alignment

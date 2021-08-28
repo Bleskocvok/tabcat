@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 
 time g++ src/main.cpp -o table -std=c++17 -pedantic -Wall -Wextra

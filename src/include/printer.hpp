@@ -17,6 +17,32 @@ enum class border_pos : size_t
 };
 
 
+inline static constexpr auto border_name_str
+        = std::array<std::string_view, static_cast<size_t>(border_pos::COUNT)>
+            {
+                "top", "bot", "left", "right", "header", "del"
+            };
+
+
+inline std::string to_str(border_pos val)
+{
+    assert(val < border_pos::COUNT);
+    switch (val)
+    {
+        case border_pos::top: return "top";
+        case border_pos::bot: return "bot";
+        case border_pos::left: return "left";
+        case border_pos::right: return "right";
+        case border_pos::header: return "header";
+        case border_pos::del: return "del";
+        default:
+            assert(false);
+            return "";
+            break;
+    }
+}
+
+
 struct print_style
 {
     struct border

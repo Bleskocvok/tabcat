@@ -27,25 +27,4 @@ struct app_settings
 
     app_settings(std::ostream& out)
         : print(out) {}
-
-    template<typename Pred>
-    argument<app_settings>* find_opt(Pred pred)
-    {
-        auto it = std::find_if(options.begin(), options.end(), pred);
-
-        if (it == options.end())
-            return nullptr;
-
-        return it->get();
-    }
-
-    argument<app_settings>* opt_by_symbol(std::string_view sym)
-    {
-        return find_opt([=](const auto& opt){ return opt->symbol() == sym; });
-    }
-
-    argument<app_settings>* opt_by_string(std::string_view str)
-    {
-        return find_opt([=](const auto& opt){ return opt->string() == str; });
-    }
 };

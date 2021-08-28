@@ -8,7 +8,7 @@
 
 #include "app_settings.hpp"
 
-// arguments
+// argument includes
 #include "delimiter.hpp"
 #include "disable_border.hpp"
 #include "help.hpp"
@@ -56,18 +56,15 @@ std::vector<std::string_view> get_arg_vec(int argc, char** argv)
 
 void perform_app(const std::vector<std::string_view>& args)
 {
-    assert(args.size() >= 1);
-
     using namespace std::string_literals;
+
+    assert(args.size() >= 1);
 
     set_locale_all("en_US.utf8");
 
     app_settings app{ std::cout };
     app.program_name = args[0];
 
-    //
-    // Setup arguments
-    //
     // parsing
     app.options.push_back(std::make_unique<delimiter>());
     // borders disabling
@@ -80,73 +77,9 @@ void perform_app(const std::vector<std::string_view>& args)
     // other
     app.options.push_back(std::make_unique<help>());
 
-    using opttype = decltype(app.options)::value_type::element_type::argtype;
-    // start with 1, skip program name
-    for (size_t i = 1; i < args.size(); i++)
-    {
-        if (args[i].empty())
-            continue;
-
-        size_t eq_idx = args[i].find('=');
-        argument<app_settings>* option = nullptr;
-
-        if (starts_with(args[i], "--"))
-        {
-            auto name = args[i].substr(2, eq_idx - 2);
-            option = app.opt_by_string(name);
-        }
-        else if (starts_with(args[i], "-"))
-        {
-            if (eq_idx != std::string_view::npos)
-            {
-                // TODO: error, invalid =
-                throw std::runtime_error("error");
-            }
-            option = app.opt_by_symbol(args[i].substr(1));
-        }
-        else
-        {
-            // TODO: error
-            throw std::runtime_error("invalid argument");
-        }
-
-        if (!option)
-        {
-            // TODO: error
-            throw std::runtime_error("not found");
-        }
-
-        switch (option->type())
-        {
-            case opttype::toggle:
-                if (eq_idx != std::string_view::npos)
-                {
-                    // TODO: error
-                    throw std::runtime_error("error");
-                }
-                (*option)(app);
-                break;
-
-            case opttype::enum_value:
-                if (eq_idx == std::string_view::npos)
-                {
-                    // TODO: error
-                    throw std::runtime_error("error");
-                }
-                (*option)(app, args[i].substr(eq_idx + 1));
-                break;
-
-            case opttype::next_arg_value:
-                if (i == args.size() - 1)
-                {
-                    // TODO: error
-                    throw std::runtime_error("error");
-                }
-                (*option)(app, args[i + 1]);
-                i++;
-                break;
-        }
-    }
+    auto error = perform_args(args, app, app.options);
+    if (error)
+        throw std::runtime_error(*error);
 
     if (app.state != app_state::cont)
         return;

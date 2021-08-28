@@ -52,3 +52,6 @@ pass --delimiter a
 pass --format=md
 fail --format=blablalbalblalbal
 pass -TBLR
+fail -TBLRb
+fail -bTBLR
+fail -TBbLR

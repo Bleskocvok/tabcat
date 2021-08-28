@@ -95,6 +95,12 @@ struct print_style
         assert(b < border_pos::COUNT);
         disabled[static_cast<size_t>(b)] = 1;
     }
+
+    void enable(border_pos b)
+    {
+        assert(b < border_pos::COUNT);
+        disabled[static_cast<size_t>(b)] = 0;
+    }
 };
 
 

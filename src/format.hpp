@@ -57,17 +57,22 @@ struct format : argument<app_settings>
 
     void operator()(app_settings& app, std::string_view val) override
     {
+        auto disabled = app.print.style.disabled;
+
         if (val == "ascii")
         {
             app.print.style = ascii_style;
+            app.print.style.disabled = disabled;
         }
         else if (val == "unicode")
         {
             app.print.style = unicode_style;
+            app.print.style.disabled = disabled;
         }
         else if (val == "tex")
         {
             app.print.style = tex_style;
+            app.print.style.disabled = disabled;
             app.print.style.disable(border_pos::top);
             app.print.style.disable(border_pos::bot);
             app.print.style.disable(border_pos::left);
@@ -77,6 +82,7 @@ struct format : argument<app_settings>
         else if (val == "md")
         {
             app.print.style = md_style;
+            app.print.style.disabled = disabled;
             app.print.style.disable(border_pos::top);
             app.print.style.disable(border_pos::bot);
         }

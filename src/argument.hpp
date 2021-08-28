@@ -101,6 +101,22 @@ inline std::optional<std::string> perform_args(
             {
                 return "invalid '='";
             }
+            // case that options are coalesced, e.g.
+            // ./executable -TBLR
+            if (args[i].substr(1).length() > 1)
+            {
+                for (char ch : args[i].substr(1))
+                {
+                    auto view = std::string_view(&ch);
+                    option = opt_by_symbol(options, view);
+                    if (!option)
+                        return "invalid argument '"s + s(view) + "'"s;
+                    if (option->type() != opttype::toggle)
+                        return "cannot coalesce argument '"s + s(view) + "'"s;
+                    (*option)(app);
+                }
+                continue;
+            }
             option = opt_by_symbol(options, args[i].substr(1));
         }
         else

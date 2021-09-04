@@ -3,6 +3,7 @@
 #include <string_view>
 #include <cassert>
 #include <bitset>
+#include <array>
 #include <iomanip>      // setw
 #include <functional>   // function
 

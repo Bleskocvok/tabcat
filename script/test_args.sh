@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-g++ src/main.cpp -o table -std=c++17 -pedantic -Wall -Wextra || exit 1
+g++ src/tabcat.cpp -o table -std=c++17 -pedantic -Wall -Wextra || exit 1
 
 B='\033[1m'
 RED='\033[0;31m'
@@ -55,3 +55,5 @@ pass -TBLR
 fail -TBLRb
 fail -bTBLR
 fail -TBbLR
+pass -d -
+pass --delimiter -

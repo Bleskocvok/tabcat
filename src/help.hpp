@@ -38,8 +38,6 @@ struct help : argument<app_settings>
 
         out << "Usage: " << app.program_name << " [OPTION]...\n";
 
-        out << std::left;
-
         for (const auto& opt : app.options)
         {
             out << "  ";
@@ -64,7 +62,8 @@ struct help : argument<app_settings>
                 str += " PARAM";
             }
 
-            out << std::setw(6) << symbol
+            out << std::left
+                << std::setw(6) << symbol
                 << std::setw(22) << str << " "
                 << opt->description() << "\n";
         }

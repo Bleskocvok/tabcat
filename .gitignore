@@ -4,5 +4,8 @@
 
 # binary
 /table
+/.vs/
+/bin/
+/out/
 
 /.vscode/

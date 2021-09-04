@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-time g++ src/main.cpp -o table -std=c++17 -pedantic -Wall -Wextra
+time g++ src/tabcat.cpp -o table -std=c++17 -pedantic -Wall -Wextra
 
 [ "$?" ] || exit 1
 
@@ -17,5 +17,5 @@ data=$({
 
 echo "$data" | ./table "$@"
 
-echo -e "\nDATA"
-echo "$data"
+# echo -e "\nDATA"
+# echo "$data"

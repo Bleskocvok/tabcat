@@ -11,8 +11,8 @@ struct delimiter : argument<app_settings>
         return argument::argtype::next_arg_value;
     }
 
-    std::string_view symbol() const override { return "d"; }
-    std::string_view string() const override { return "delimiter"; }
+    std::optional<char> symbol() const override { return 'd'; }
+    std::optional<std::string> string() const override { return "delimiter"; }
 
     std::string_view description() const override
     {

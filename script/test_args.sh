@@ -32,11 +32,6 @@ function perform()
 function pass()
 {
     header $@
-    # echo "" | $APP $@ &> /dev/null || {
-    #     echo -e "${RED}${PASS_NOK}${APP} $@ ${NC}" | ind;
-    #     exit 1;
-    # }
-    # echo -e "${B}${GREEN}ok${NC}" | ind
     perform $@ || {
         echo -e "${RED}${PASS_NOK}${APP} $@ ${NC}" | ind;
         exit 1;
@@ -47,11 +42,6 @@ function pass()
 function fail()
 {
     header $@
-    # echo "" | $APP $@ &> /dev/null && {
-    #     echo -e "${RED}${FAIL_NOK}${APP} $@ ${NC}" | ind;
-    #     exit 1;
-    # }
-    # echo -e "${B}${GREEN}ok${NC}" | ind
     perform $@ && {
         echo -e "${RED}${FAIL_NOK}${APP} $@ ${NC}" | ind;
         exit 1;

@@ -14,8 +14,7 @@ struct help : argument<app_settings>
         return argument::argtype::toggle;
     }
 
-    // std::string_view symbol() const override { return "h"; }
-    std::string_view string() const override { return "help"; }
+    std::optional<std::string> string() const override { return "help"; }
 
     std::string_view description() const override
     {
@@ -30,7 +29,6 @@ struct help : argument<app_settings>
     void operator()(app_settings& app) override
     {
         using namespace std::string_literals;
-        using s = std::string;
 
         app.state = app_state::quit_ok;
 
@@ -43,14 +41,14 @@ struct help : argument<app_settings>
             out << "  ";
 
             std::string symbol = "  ";
-            symbol += opt->symbol().empty() ? ""
-                                            : "-"s + s(opt->symbol());
-            if (!opt->symbol().empty() && !opt->string().empty())
+            symbol += !opt->symbol() ? ""
+                                     : "-"s + *opt->symbol();
+            if (opt->symbol() && opt->string())
                 symbol += ",";
 
             std::string str;
-            str += opt->string().empty() ? ""
-                                         : "--"s + s(opt->string());
+            str += !opt->string() ? ""
+                                  : "--"s + *opt->string();
 
             if (opt->type() == argument::argtype::enum_value)
             {

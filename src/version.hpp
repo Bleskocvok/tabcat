@@ -11,8 +11,8 @@ struct version : argument<app_settings>
         return argument::argtype::toggle;
     }
 
-    std::string_view symbol() const override { return "V"; }
-    std::string_view string() const override { return "version"; }
+    std::optional<char> symbol() const override { return 'V'; }
+    std::optional<std::string> string() const override { return "version"; }
 
     std::string_view description() const override
     {

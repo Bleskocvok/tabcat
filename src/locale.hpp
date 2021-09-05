@@ -11,7 +11,7 @@ struct locale : argument<app_settings>
         return argument::argtype::enum_value;
     }
 
-    std::string_view string() const override { return "locale"; }
+    std::optional<std::string> string() const override { return "locale"; }
 
     std::string_view description() const override
     {

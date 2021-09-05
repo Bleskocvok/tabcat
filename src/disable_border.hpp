@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "app_settings.hpp"
 #include "argument.hpp"
 
@@ -12,20 +14,25 @@ struct disable_border : argument<app_settings>
         return argument::argtype::toggle;
     }
 
-    std::string_view symbol() const override
+    std::optional<char> symbol() const override
     {
         if constexpr (Border == border_pos::top)
-            return "T";
+            return 'T';
         else if constexpr (Border == border_pos::bot)
-            return "B";
+            return 'B';
         else if constexpr (Border == border_pos::left)
-            return "L";
+            return 'L';
         else if constexpr (Border == border_pos::right)
-            return "R";
+            return 'R';
         else if constexpr (Border == border_pos::header)
-            return "H";
+            return 'H';
         else if constexpr (Border == border_pos::del)
-            return "D";
+            return 'D';
+        else
+        {
+            assert(false);
+            return std::nullopt;
+        }
     }
 
     std::string_view description() const override
@@ -42,6 +49,11 @@ struct disable_border : argument<app_settings>
             return "disable border below HEADER";
         else if constexpr (Border == border_pos::del)
             return "disable DELIMITER between columns";
+        else
+        {
+            assert(false);
+            return "INVALID";
+        }
     }
 
     void operator()(app_settings& app) override

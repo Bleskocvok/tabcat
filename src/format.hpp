@@ -48,7 +48,7 @@ struct format : argument<app_settings>
         return argument::argtype::enum_value;
     }
 
-    std::string_view string() const override { return "format"; }
+    std::optional<std::string> string() const override { return "format"; }
 
     std::string_view description() const override
     {

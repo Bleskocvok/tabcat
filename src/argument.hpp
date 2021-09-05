@@ -22,8 +22,8 @@ struct argument
 
     virtual argtype type() const { return argtype::toggle; }
 
-    virtual std::string_view symbol() const { return ""; }
-    virtual std::string_view string() const { return ""; }
+    virtual std::optional<char>         symbol() const { return std::nullopt; }
+    virtual std::optional<std::string>  string() const { return std::nullopt; }
 
     virtual std::string_view description() const { return ""; }
 
@@ -50,11 +50,8 @@ argument<App>* find_opt(const option_vec<App>& options, Pred pred)
 
 template<typename App>
 argument<App>* opt_by_symbol(const option_vec<App>& opts,
-                             std::string_view sym)
+                             char sym)
 {
-    if (sym.empty())
-        return nullptr;
-
     return find_opt(opts, [=](const auto& opt){ return opt->symbol() == sym; });
 }
 
@@ -63,9 +60,6 @@ template<typename App>
 argument<App>* opt_by_string(const option_vec<App>& opts,
                              std::string_view str)
 {
-    if (str.empty())
-        return nullptr;
-
     return find_opt(opts, [=](const auto& opt){ return opt->string() == str; });
 }
 
@@ -107,18 +101,16 @@ inline std::optional<std::string> perform_args(
             {
                 for (char ch : args[i].substr(1))
                 {
-                    auto view = std::string();
-                    view += ch;
-                    option = opt_by_symbol(options, view);
+                    option = opt_by_symbol(options, ch);
                     if (!option)
-                        return "invalid argument '"s + s(view) + "'"s;
+                        return "invalid argument '"s + ch + "'"s;
                     if (option->type() != opttype::toggle)
-                        return "cannot coalesce argument '"s + s(view) + "'"s;
+                        return "cannot coalesce argument '"s + ch + "'"s;
                     (*option)(app);
                 }
                 continue;
             }
-            option = opt_by_symbol(options, args[i].substr(1));
+            option = opt_by_symbol(options, args[i].at(1));
         }
         else
         {

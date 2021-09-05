@@ -1,0 +1,11 @@
+Package: tabcat
+Source: tabcat
+Version: 1.0.0
+Architecture: amd64    
+Maintainer: Bleskocvok
+Homepage: https://github.com/Bleskocvok/tabcat
+Description: Utility to arrange CSV into a neat table.
+  Usage: tabcat [OPTION]
+Priority: optional
+Section: utils
+Depends:

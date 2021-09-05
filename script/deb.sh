@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-if [ "$#" -lt 3 ];
+if [ "$#" -lt 2 ];
 then
     {
         echo "Wrong arguments"
@@ -13,7 +13,7 @@ fi
 
 EXECUTABLE="$1"
 APP_NAME=`basename $1`
-REVISION="$3"
+REVISION="$2"
 INSTALL_LOCATION="usr/local/bin"
 
 

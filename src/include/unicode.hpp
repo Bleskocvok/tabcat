@@ -9,7 +9,8 @@
 
 inline void set_locale_all(const std::string& locale)
 {
-    std::setlocale(LC_ALL, locale.c_str());
+    static std::string loc = locale;
+    std::setlocale(LC_ALL, loc.c_str());
 }
 
 

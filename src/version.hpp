@@ -23,7 +23,7 @@ struct version : argument<app_settings>
     {
         app.state = app_state::quit_ok;
         auto& out = std::cerr;
-        out << "0.8.0-alpha\n";
+        out << "1.0.0\n";
     }
 };
 

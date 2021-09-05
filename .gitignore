@@ -4,8 +4,11 @@
 
 # binary
 /table
+/tabcat
 /.vs/
 /bin/
 /out/
+/deb/
 
 /.vscode/
+

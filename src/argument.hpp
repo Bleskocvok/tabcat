@@ -107,7 +107,8 @@ inline std::optional<std::string> perform_args(
             {
                 for (char ch : args[i].substr(1))
                 {
-                    auto view = std::string_view(&ch);
+                    auto view = std::string();
+                    view += ch;
                     option = opt_by_symbol(options, view);
                     if (!option)
                         return "invalid argument '"s + s(view) + "'"s;

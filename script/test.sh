@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-
-time g++ src/tabcat.cpp -o table -std=c++17 -pedantic -Wall -Wextra
-
-[ "$?" ] || exit 1
-
 data=$({
     echo "rights;uid;user;group;size;mon;day;time;name"
 
@@ -15,7 +10,7 @@ data=$({
 })
 
 
-echo "$data" | ./table "$@"
+echo "$data" | ./tabcat "$@"
 
 # echo -e "\nDATA"
 # echo "$data"

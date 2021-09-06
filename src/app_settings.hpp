@@ -21,7 +21,8 @@ struct app_settings
 {
     parser parse;
     printer<std::ostream> print;
-    std::vector<std::unique_ptr<argument<app_settings>>> options;
+    // std::vector<std::unique_ptr<argument<app_settings>>> options;
+    arguments<app_settings> args;
     std::string program_name;
     app_state state = app_state::cont;
 

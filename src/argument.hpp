@@ -3,6 +3,7 @@
 #include <memory>       // unique_ptr
 #include <vector>
 #include <string>
+#include <utility>      // forward
 #include <optional>
 #include <string_view>
 
@@ -33,123 +34,142 @@ struct argument
 
 
 template<typename App>
-using option_vec = std::vector<std::unique_ptr<argument<App>>>;
-
-
-template<typename App, typename Pred>
-argument<App>* find_opt(const option_vec<App>& options, Pred pred)
+class arguments
 {
-    auto it = std::find_if(options.begin(), options.end(), pred);
 
-    if (it == options.end())
-        return nullptr;
+std::vector<std::unique_ptr<argument<App>>> opts;
 
-    return it->get();
-}
-
-
-template<typename App>
-argument<App>* opt_by_symbol(const option_vec<App>& opts,
-                             char sym)
-{
-    return find_opt(opts, [=](const auto& opt){ return opt->symbol() == sym; });
-}
-
-
-template<typename App>
-argument<App>* opt_by_string(const option_vec<App>& opts,
-                             std::string_view str)
-{
-    return find_opt(opts, [=](const auto& opt){ return opt->string() == str; });
-}
-
-
-template<typename App>
-[[nodiscard]]
-inline std::optional<std::string> perform_args(
-        const std::vector<std::string_view>& args,
-        App& app,
-        const option_vec<App>& options)
-{
-    using namespace std::string_literals;
-    using s = std::string;
-    using opttype = typename argument<App>::argtype;
-
-    // start with 1, skip program name
-    for (size_t i = 1; i < args.size(); i++)
+public:
+    std::vector<std::unique_ptr<argument<App>>>& data() { return opts; }
+    const std::vector<std::unique_ptr<argument<App>>>& data() const
     {
-        if (args[i].empty())
-            continue;
+        return opts;
+    }
 
-        size_t eq_idx = args[i].find('=');
-        argument<App>* option = nullptr;
+    template<typename T, typename ... Args>
+    void emplace(Args&& ... args)
+    {
+        opts.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+    }
 
-        if (starts_with(args[i], "--"))
+    [[nodiscard]]
+    std::optional<std::string> perform(int argc, char** argv, App& app)
+    {
+        return {};
+    }
+
+    [[nodiscard]]
+    std::optional<std::string> perform(
+            const std::vector<std::string_view>& args,
+            App& app)
+    {
+        using namespace std::string_literals;
+        using s = std::string;
+        using opttype = typename argument<App>::argtype;
+
+        // start with 1, skip program name
+        for (size_t i = 1; i < args.size(); i++)
         {
-            auto name = args[i].substr(2, eq_idx - 2);
-            option = opt_by_string(options, name);
-        }
-        else if (starts_with(args[i], "-"))
-        {
-            if (eq_idx != std::string_view::npos)
-            {
-                return "invalid '='";
-            }
-            // case that options are coalesced, e.g.
-            // ./executable -TBLR
-            if (args[i].substr(1).length() > 1)
-            {
-                for (char ch : args[i].substr(1))
-                {
-                    option = opt_by_symbol(options, ch);
-                    if (!option)
-                        return "invalid argument '"s + ch + "'"s;
-                    if (option->type() != opttype::toggle)
-                        return "cannot coalesce argument '"s + ch + "'"s;
-                    (*option)(app);
-                }
+            if (args[i].empty())
                 continue;
+
+            size_t eq_idx = args[i].find('=');
+            argument<App>* option = nullptr;
+
+            if (starts_with(args[i], "--"))
+            {
+                auto name = args[i].substr(2, eq_idx - 2);
+                option = opt_by_string(name);
             }
-            option = opt_by_symbol(options, args[i].at(1));
-        }
-        else
-        {
-            return "invalid argument '"s + s(args[i]) + "'"s;
-        }
-
-        if (!option)
-        {
-            return "invalid argument '"s + s(args[i]) + "'"s;
-        }
-
-        switch (option->type())
-        {
-            case opttype::toggle:
+            else if (starts_with(args[i], "-"))
+            {
                 if (eq_idx != std::string_view::npos)
                 {
-                    return "unexpected '='";
+                    return "invalid '='";
                 }
-                (*option)(app);
-                break;
-
-            case opttype::enum_value:
-                if (eq_idx == std::string_view::npos)
+                // case that options are coalesced, e.g.
+                // ./executable -TBLR
+                if (args[i].substr(1).length() > 1)
                 {
-                    return "expected '='";
+                    for (char ch : args[i].substr(1))
+                    {
+                        option = opt_by_symbol(ch);
+                        if (!option)
+                            return "invalid argument '"s + ch + "'"s;
+                        if (option->type() != opttype::toggle)
+                            return "cannot coalesce argument '"s + ch + "'"s;
+                        (*option)(app);
+                    }
+                    continue;
                 }
-                (*option)(app, args[i].substr(eq_idx + 1));
-                break;
+                option = opt_by_symbol(args[i].at(1));
+            }
+            else
+            {
+                return "invalid argument '"s + s(args[i]) + "'"s;
+            }
 
-            case opttype::next_arg_value:
-                if (i == args.size() - 1)
-                {
-                    return "expected parameter for argument '"s
-                            + s(args[i]) + "'"s;
-                }
-                (*option)(app, args[i + 1]);
-                i++;
-                break;
+            if (!option)
+            {
+                return "invalid argument '"s + s(args[i]) + "'"s;
+            }
+
+            switch (option->type())
+            {
+                case opttype::toggle:
+                    if (eq_idx != std::string_view::npos)
+                    {
+                        return "unexpected '='";
+                    }
+                    (*option)(app);
+                    break;
+
+                case opttype::enum_value:
+                    if (eq_idx == std::string_view::npos)
+                    {
+                        return "expected '='";
+                    }
+                    (*option)(app, args[i].substr(eq_idx + 1));
+                    break;
+
+                case opttype::next_arg_value:
+                    if (i == args.size() - 1)
+                    {
+                        return "expected parameter for argument '"s
+                                + s(args[i]) + "'"s;
+                    }
+                    (*option)(app, args[i + 1]);
+                    i++;
+                    break;
+            }
         }
+        return std::nullopt;
     }
-    return std::nullopt;
-}
+
+    template<typename Pred>
+    argument<App>* find_opt(Pred pred)
+    {
+        auto it = std::find_if(opts.begin(), opts.end(), pred);
+
+        if (it == opts.end())
+            return nullptr;
+
+        return it->get();
+    }
+
+    argument<App>* opt_by_symbol(char sym)
+    {
+        return find_opt([=](const auto& opt)
+        {
+            return opt->symbol() == sym;
+        });
+    }
+
+    argument<App>* opt_by_string(std::string_view str)
+    {
+        return find_opt([=](const auto& opt)
+        {
+            return opt->string() == str;
+        });
+    }
+};

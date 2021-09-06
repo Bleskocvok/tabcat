@@ -40,7 +40,6 @@ int main(int argc, char** argv)
         std::cerr << "Error: " << ex.what() << std::endl;
         return 2;
     }
-
     return 0;
 }
 
@@ -68,23 +67,25 @@ void perform_app(const std::vector<std::string_view>& args)
     app_settings app{ std::cout };
     app.program_name = args[0];
 
-    // parsing
-    app.options.push_back(std::make_unique<delimiter>());
-    app.options.push_back(std::make_unique<locale>());
-    // output style
-    app.options.push_back(std::make_unique<format>());
-    // borders disabling
-    app.options.push_back(std::make_unique<disable_border<border_pos::top>>());
-    app.options.push_back(std::make_unique<disable_border<border_pos::bot>>());
-    app.options.push_back(std::make_unique<disable_border<border_pos::left>>());
-    app.options.push_back(std::make_unique<disable_border<border_pos::right>>());
-    app.options.push_back(std::make_unique<disable_border<border_pos::header>>());
-    app.options.push_back(std::make_unique<disable_border<border_pos::del>>());
-    // other
-    app.options.push_back(std::make_unique<version>());
-    app.options.push_back(std::make_unique<help>());
 
-    auto error = perform_args(args, app, app.options);
+    // parsing
+    app.args.emplace<delimiter>();
+    app.args.emplace<locale>();
+    // output style
+    app.args.emplace<format>();
+    // borders disabling
+    app.args.emplace<disable_border<border_pos::top>>();
+    app.args.emplace<disable_border<border_pos::bot>>();
+    app.args.emplace<disable_border<border_pos::left>>();
+    app.args.emplace<disable_border<border_pos::right>>();
+    app.args.emplace<disable_border<border_pos::header>>();
+    app.args.emplace<disable_border<border_pos::del>>();
+    // other
+    app.args.emplace<version>();
+    app.args.emplace<help>();
+
+
+    auto error = app.args.perform(args, app);
     if (error)
         throw std::runtime_error(*error);
 

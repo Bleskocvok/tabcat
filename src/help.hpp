@@ -36,7 +36,7 @@ struct help : argument<app_settings>
 
         out << "Usage: " << app.program_name << " [OPTION]...\n";
 
-        for (const auto& opt : app.options)
+        for (const auto& opt : app.args.data())
         {
             out << "  ";
 

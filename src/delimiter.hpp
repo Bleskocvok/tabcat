@@ -6,9 +6,9 @@
 
 struct delimiter : argument<app_settings>
 {
-    argument::argtype type() const override
+    argtype type() const override
     {
-        return argument::argtype::next_arg_value;
+        return argtype::next_arg_value;
     }
 
     std::optional<char> symbol() const override { return 'd'; }

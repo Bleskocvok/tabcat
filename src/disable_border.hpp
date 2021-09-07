@@ -9,9 +9,9 @@
 template<border_pos Border>
 struct disable_border : argument<app_settings>
 {
-    argument::argtype type() const override
+    argtype type() const override
     {
-        return argument::argtype::toggle;
+        return argtype::toggle;
     }
 
     std::optional<char> symbol() const override

@@ -43,9 +43,9 @@ inline static constexpr print_style md_style
 
 struct format : argument<app_settings>
 {
-    argument::argtype type() const override
+    argtype type() const override
     {
-        return argument::argtype::enum_value;
+        return argtype::enum_value;
     }
 
     std::optional<std::string> string() const override { return "format"; }

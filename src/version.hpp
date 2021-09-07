@@ -6,9 +6,9 @@
 
 struct version : argument<app_settings>
 {
-    argument::argtype type() const override
+    argtype type() const override
     {
-        return argument::argtype::toggle;
+        return argtype::toggle;
     }
 
     std::optional<char> symbol() const override { return 'V'; }
@@ -22,8 +22,7 @@ struct version : argument<app_settings>
     void operator()(app_settings& app) override
     {
         app.state = app_state::quit_ok;
-        auto& out = std::cerr;
-        out << "1.0.0\n";
+        std::cerr << "1.0.0\n";
     }
 };
 

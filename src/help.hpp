@@ -9,9 +9,9 @@
 
 struct help : argument<app_settings>
 {
-    argument::argtype type() const override
+    argtype type() const override
     {
-        return argument::argtype::toggle;
+        return argtype::toggle;
     }
 
     std::optional<std::string> string() const override { return "help"; }
@@ -23,48 +23,16 @@ struct help : argument<app_settings>
 
     void operator()(app_settings& /*app*/, std::string_view /*val*/) override
     {
-
+        // TODO: print help for a given option
     }
 
     void operator()(app_settings& app) override
     {
-        using namespace std::string_literals;
-
         app.state = app_state::quit_ok;
 
-        auto& out = std::cerr;
+        std::cerr << "Usage: " << app.program_name << " [OPTION]...\n";
 
-        out << "Usage: " << app.program_name << " [OPTION]...\n";
-
-        for (const auto& opt : app.args.data())
-        {
-            out << "  ";
-
-            std::string symbol = "  ";
-            symbol += !opt->symbol() ? ""
-                                     : "-"s + *opt->symbol();
-            if (opt->symbol() && opt->string())
-                symbol += ",";
-
-            std::string str;
-            str += !opt->string() ? ""
-                                  : "--"s + *opt->string();
-
-            if (opt->type() == argument::argtype::enum_value)
-            {
-                str += "=PARAM";
-            }
-
-            if (opt->type() == argument::argtype::next_arg_value)
-            {
-                str += " PARAM";
-            }
-
-            out << std::left
-                << std::setw(6) << symbol
-                << std::setw(22) << str << " "
-                << opt->description() << "\n";
-        }
+        app.args.print_help(std::cerr);
     }
 };
 

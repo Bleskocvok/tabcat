@@ -4,21 +4,23 @@
 #include <vector>
 #include <string>
 #include <utility>      // forward
+#include <ostream>
 #include <optional>
 #include <string_view>
+
+
+enum class argtype
+{
+    toggle,         // on/off, takes no parameter
+    enum_value,     // takes a parameter like this: --argname=<parameter>
+    next_arg_value  // takes a parameter like this: --argname "<parameter>"
+                    // or like this:                -a "<parameter>"
+};
 
 
 template<typename App>
 struct argument
 {
-    enum class argtype
-    {
-        toggle,         // on/off, takes no parameter
-        enum_value,     // takes a parameter like this: --argname=<parameter>
-        next_arg_value  // takes a parameter like this: --argname "<parameter>"
-                        // or like this:                -a "<parameter>"
-    };
-
     virtual ~argument() = default;
 
     virtual argtype type() const { return argtype::toggle; }
@@ -55,6 +57,7 @@ public:
     [[nodiscard]]
     std::optional<std::string> perform(int argc, char** argv, App& app)
     {
+        // TODO: this should probably be the main one
         return {};
     }
 
@@ -65,7 +68,6 @@ public:
     {
         using namespace std::string_literals;
         using s = std::string;
-        using opttype = typename argument<App>::argtype;
 
         // start with 1, skip program name
         for (size_t i = 1; i < args.size(); i++)
@@ -96,7 +98,7 @@ public:
                         option = opt_by_symbol(ch);
                         if (!option)
                             return "invalid argument '"s + ch + "'"s;
-                        if (option->type() != opttype::toggle)
+                        if (option->type() != argtype::toggle)
                             return "cannot coalesce argument '"s + ch + "'"s;
                         (*option)(app);
                     }
@@ -116,7 +118,7 @@ public:
 
             switch (option->type())
             {
-                case opttype::toggle:
+                case argtype::toggle:
                     if (eq_idx != std::string_view::npos)
                     {
                         return "unexpected '='";
@@ -124,7 +126,7 @@ public:
                     (*option)(app);
                     break;
 
-                case opttype::enum_value:
+                case argtype::enum_value:
                     if (eq_idx == std::string_view::npos)
                     {
                         return "expected '='";
@@ -132,7 +134,7 @@ public:
                     (*option)(app, args[i].substr(eq_idx + 1));
                     break;
 
-                case opttype::next_arg_value:
+                case argtype::next_arg_value:
                     if (i == args.size() - 1)
                     {
                         return "expected parameter for argument '"s
@@ -171,5 +173,40 @@ public:
         {
             return opt->string() == str;
         });
+    }
+
+    void print_help(std::ostream& out) const
+    {
+        using namespace std::string_literals;
+
+        for (const auto& opt : opts)
+        {
+            out << "  ";
+
+            std::string symbol = "  ";
+            symbol += !opt->symbol() ? ""
+                                     : "-"s + *opt->symbol();
+            if (opt->symbol() && opt->string())
+                symbol += ",";
+
+            std::string str;
+            str += !opt->string() ? ""
+                                  : "--"s + *opt->string();
+
+            if (opt->type() == argtype::enum_value)
+            {
+                str += "=PARAM";
+            }
+
+            if (opt->type() == argtype::next_arg_value)
+            {
+                str += " PARAM";
+            }
+
+            out << std::left
+                << std::setw(6) << symbol
+                << std::setw(22) << str << " "
+                << opt->description() << "\n";
+        }
     }
 };

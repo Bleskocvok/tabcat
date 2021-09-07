@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-time clang++ src/tabcat.cpp -o tabcat \
+time g++ src/tabcat.cpp -o tabcat \
     -std=c++17  \
     -pedantic   \
     -Wall       \
     -Wextra     \
+    -static -static-libgcc -static-libstdc++ \
     || exit 1

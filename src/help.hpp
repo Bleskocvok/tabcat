@@ -30,7 +30,7 @@ struct help : argument<app_settings>
     {
         app.state = app_state::quit_ok;
 
-        std::cerr << "Usage: " << app.program_name << " [OPTION]...\n";
+        std::cerr << "Usage: " << app.program_name << " [OPTIONS]... [FILE]\n";
 
         app.args.print_help(std::cerr);
     }

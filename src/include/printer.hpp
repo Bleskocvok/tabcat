@@ -108,18 +108,23 @@ struct print_style
 template<typename PrintOutput>
 struct printer
 {
-    PrintOutput& out;
+    PrintOutput* out;
     print_style style;
 
     printer(PrintOutput& out)
-        : out(out) {}
+        : out(&out) {}
+
+    void output(PrintOutput& stream)
+    {
+        out = &stream;
+    }
 
     template<typename T>
     void repeat(const T& t, size_t count) const
     {
         for (size_t i = 0; i < count; i++)
         {
-            out << t;
+            *out << t;
         }
     }
 
@@ -128,7 +133,7 @@ struct printer
     {
         if (!style.is_disabled(border_pos::left))
         {
-            out << bstyle.beg;
+            *out << bstyle.beg;
             repeat(bstyle.mid, style.spacing);
         }
 
@@ -148,7 +153,7 @@ struct printer
             else
             {
                 repeat(bstyle.mid, style.spacing);
-                out << bstyle.join;
+                *out << bstyle.join;
                 repeat(bstyle.mid, style.spacing);
             }
 
@@ -158,9 +163,9 @@ struct printer
         if (!style.is_disabled(border_pos::right))
         {
             repeat(bstyle.mid, style.spacing);
-            out << bstyle.end;
+            *out << bstyle.end;
         }
-        out << style.eol;
+        *out << style.eol;
     }
 
     void print(const table& tab) const
@@ -179,14 +184,14 @@ struct printer
                 print(border_pos::del, tab);
             }
 
-            out << (is_numeric(str) ? std::right : std::left)
+            *out << (is_numeric(str) ? std::right : std::left)
                 << std::setw(tab.columns[loc.col].width - size_diff(str))
                 << str;
 
             if (loc.last_col)
             {
                 print(border_pos::right, tab);
-                out << style.eol;
+                *out << style.eol;
             }
 
             if (loc.row == 0 && loc.last_col)
@@ -194,7 +199,7 @@ struct printer
                 print(border_pos::header, tab);
             }
 
-            out << color::reset;
+            *out << color::reset;
         };
         tab.for_each_cell(print_cell);
 
@@ -226,13 +231,13 @@ struct printer
                 break;
 
             case b::left:
-                out << style.outer;
+                *out << style.outer;
                 spacing();
                 break;
 
             case b::right:
                 spacing();
-                out << style.outer;
+                *out << style.outer;
                 break;
 
             case b::header:
@@ -240,7 +245,7 @@ struct printer
                 break;
 
             case b::del:
-                out << style.del;
+                *out << style.del;
                 spacing();
                 break;
 

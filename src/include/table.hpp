@@ -89,16 +89,13 @@ public:
         return columns[c].data[r];
     }
 
-    static table parse(std::istream& in, parser parser)
+    static table parse(std::istream& in, parser& parser)
     {
-        const auto del = parser.del;
-        const auto eol = parser.eol;
-
         using view = std::string_view;
 
         table result;
 
-        parse_line(std::cin, del, eol, [&](view str, size_t /* col */)
+        parser.parse_line(in, [&](view str, size_t /* col */)
         {
             auto vec = std::vector{ std::string{ std::move(str) } };
             result.columns.push_back(column{ std::move(vec) });
@@ -106,7 +103,7 @@ public:
 
         while (in)
         {
-            parse_line(in, del, eol, [&](view str, size_t col)
+            parser.parse_line(in, [&](view str, size_t col)
             {
                 if (col >= result.columns.size())
                 {

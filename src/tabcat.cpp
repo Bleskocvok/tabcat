@@ -15,6 +15,8 @@
 #include "version.hpp"
 #include "format.hpp"
 #include "locale.hpp"
+#include "file.hpp"
+#include "output_file.hpp"
 
 
 void perform_app(const std::vector<std::string_view>& args);
@@ -64,7 +66,7 @@ void perform_app(const std::vector<std::string_view>& args)
 
     set_locale_all("en_US.utf8");
 
-    app_settings app{ std::cout };
+    app_settings app;
     app.program_name = args[0];
 
 
@@ -73,6 +75,7 @@ void perform_app(const std::vector<std::string_view>& args)
     app.args.emplace<locale>();
     // output style
     app.args.emplace<format>();
+    app.args.emplace<output_file>();
     // borders disabling
     app.args.emplace<disable_border<border_pos::top>>();
     app.args.emplace<disable_border<border_pos::bot>>();
@@ -83,6 +86,8 @@ void perform_app(const std::vector<std::string_view>& args)
     // other
     app.args.emplace<version>();
     app.args.emplace<help>();
+    // file
+    app.args.file_emplace<file>();
 
 
     auto error = app.args.perform(args, app);
@@ -92,6 +97,12 @@ void perform_app(const std::vector<std::string_view>& args)
     if (app.state != app_state::cont)
         return;
 
-    table tab = table::parse(std::cin, app.parse);
+    app.input->open();
+    table tab = table::parse(app.input->istream(), app.parse);
+    app.input->close();
+
+    app.output->open();
+    app.print.output(app.output->ostream());
     app.print.print(tab);
+    app.output->close();
 }

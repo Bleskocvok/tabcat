@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ostream>
 #include <vector>
 #include <memory>
 #include <algorithm>    // find_if
@@ -9,6 +8,7 @@
 #include "include/printer.hpp"
 #include "include/parser.hpp"
 #include "argument.hpp"
+#include "io.hpp"
 
 
 enum class app_state
@@ -19,13 +19,11 @@ enum class app_state
 
 struct app_settings
 {
+    std::unique_ptr<abs_input> input = std::make_unique<std_input>();
+    std::unique_ptr<abs_output> output = std::make_unique<std_output>();
     parser parse;
-    printer<std::ostream> print;
-    // std::vector<std::unique_ptr<argument<app_settings>>> options;
+    printer<std::ostream> print{ output->ostream() };
     arguments<app_settings> args;
     std::string program_name;
     app_state state = app_state::cont;
-
-    app_settings(std::ostream& out)
-        : print(out) {}
 };

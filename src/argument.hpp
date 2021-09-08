@@ -36,10 +36,20 @@ struct argument
 
 
 template<typename App>
+struct file_arg
+{
+    virtual ~file_arg() = default;
+
+    virtual void operator()(App&, std::string) {}
+};
+
+
+template<typename App>
 class arguments
 {
 
 std::vector<std::unique_ptr<argument<App>>> opts;
+std::unique_ptr<file_arg<App>> file_opt;
 
 public:
     std::vector<std::unique_ptr<argument<App>>>& data() { return opts; }
@@ -53,6 +63,14 @@ public:
     {
         opts.push_back(std::make_unique<T>(std::forward<Args>(args)...));
     }
+
+    template<typename T, typename ... Args>
+    void file_emplace(Args&& ... args)
+    {
+        file_opt = std::make_unique<T>(std::forward<Args>(args)...);
+    }
+
+    bool file_accepted() const { return file_opt.operator bool(); }
 
     [[nodiscard]]
     std::optional<std::string> perform(int argc, char** argv, App& app)
@@ -106,9 +124,10 @@ public:
                 }
                 option = opt_by_symbol(args[i].at(1));
             }
-            else
+            else if (file_accepted())
             {
-                return "invalid argument '"s + s(args[i]) + "'"s;
+                (*file_opt)(app, std::string(args[i]));
+                continue;
             }
 
             if (!option)

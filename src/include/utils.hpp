@@ -16,16 +16,9 @@ inline bool is_numeric(std::string_view str)
 }
 
 
-inline void getline_to_str(std::istream& in
-                    , std::string& out
-                    , std::string_view eol = "\n");
-
-
-template<typename CellFunc>
-inline void parse_line(std::istream& in
-                , std::string_view del
-                , std::string_view eol
-                , CellFunc func);
+inline void getline_to_str(std::istream& in,
+                           std::string& out,
+                           std::string_view eol = "\n");
 
 
 inline void trim(std::string& str);
@@ -37,29 +30,14 @@ inline bool starts_with(std::string_view str, std::string_view prefix);
 inline bool ends_with(std::string_view str, std::string_view suffix);
 
 
-template<typename CellFunc>
-void parse_line(std::istream& in
-                , std::string_view del
-                , std::string_view eol
-                , CellFunc func)
+inline void whitespace(std::istream& in)
 {
-    std::string line;
-    getline_to_str(in, line, eol);
+    auto inline_space = [](char ch){ return ch == ' ' || ch == '\t'; };
 
-    trim(line);
-    if (line.empty())
-        return;
-
-    std::string_view l = line;
-
-    size_t pos = 0;
-    size_t col;
-    for (col = 0; (pos = l.find(del)) != std::string_view::npos; col++)
+    while (in && inline_space(in.peek()))
     {
-        func(l.substr(0, pos), col);
-        l.remove_prefix(pos + del.length());
+        in.get();
     }
-    func(l, col);
 }
 
 
@@ -86,9 +64,9 @@ void trim(std::string& str)
 }
 
 
-void getline_to_str(std::istream& in
-                    , std::string& out
-                    , std::string_view eol)
+void getline_to_str(std::istream& in,
+                    std::string& out,
+                    std::string_view eol)
 {
     assert(!eol.empty());
     size_t start = out.size();

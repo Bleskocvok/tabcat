@@ -66,3 +66,5 @@ fail -bTBLR
 fail -TBbLR
 pass -d -
 pass --delimiter -
+fail sadasddasfafasfasdfnashdjkasdhaskjdhasj
+pass -o /dev/null

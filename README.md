@@ -19,14 +19,14 @@ Using `tabcat` you can arrange it in a nice table.
 The program expects the data on standard input (`stdin`), so to pass the data to `tabcat`, you can use these commands for example:
 
 ```shell
-$ cat table.csv
+$ cat data.csv
 numbers;a;words
 1;b;thing
 40;c;sea
 66;d;car
 1024;e;ultralongword
 
-$ cat table.csv | tabcat
+$ tabcat data.csv
 ┌─────────┬───┬───────────────┐
 │ numbers │ a │ words         │
 ├─────────┼───┼───────────────┤

@@ -1,0 +1,88 @@
+
+.\" Manpage for tabcat.
+.TH man 1 "09 Sep 2021" "1.0.1" "tabcat man page"
+
+.SH NAME
+tabcat - arrange CSV data into an nice table
+
+.SH SYNOPSIS
+tabcat
+.B [OPTIONS]... [FILE]
+
+.SH DESCRIPTION
+This program is designed to be used in scripts.
+
+If no file is provided, the program expects input on stdin. Below is the list of accepted arguments.
+
+.RS
+.nf
+.\".OP
+-d, --delimiter PARAM      set the character separating input values
+    --locale=PARAM         set the current locale
+    --format=PARAM         set output format [ascii/unicode/tex/md]
+-T                         disable TOP border
+-B                         disable BOTTOM border
+-L                         disable LEFT border
+-R                         disable RIGHT border
+-H                         disable border below HEADER
+-D                         disable DELIMITER between columns
+-V, --version              print version and exit
+    --help                 print help and quit
+.RE
+
+.SH FILES
+.TP
+.I
+/usr/local/bin/tabcat
+
+
+.\" ------------------ EXAMPLES --------------------
+
+.SH EXAMPLES
+.SS Example 1
+
+.P
+Using this code you can format the output of
+.B ls
+to be arranged in a table.
+
+.RS
+.nf
+.eo
+{
+    echo "rights;uid;user;group;size;mon;day;time;name";
+    ls test/ -alF \
+        | sed -E "s/([^ ]) /\1;/g" \
+        | sed -E "s/ //g" \
+        | tail -n +2;
+} | tabcat
+.ec
+.fi
+.RE
+
+
+.\" ------------------ EXIT STATUS --------------------
+
+.SH EXIT STATUS
+.TP
+0
+Success
+.TP
+1
+Error; the input data is misaligned (either contains a row, or column sticking out)
+.TP
+2
+Error; either incorrect arguments, or any other error
+
+.SH SEE ALSO
+cat(1)
+
+.SH BUGS
+Report bugs at <https://github.com/Bleskocvok/tabcat/issues>
+
+.SH AUTHOR
+Written by František Bráblík
+
+.SH COPYRIGHT
+Copyright © 2021
+

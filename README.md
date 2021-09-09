@@ -16,7 +16,7 @@ numbers;a;words
 ```
 
 Using `tabcat` you can arrange it in a nice table.
-The program expects the data on standard input (`stdin`), so to pass the data to `tabcat`, you can use these commands for example:
+The program expects the data either on standard input (`stdin`) or in a file. To pass the data to `tabcat`, you can use these commands for example:
 
 ```shell
 $ cat data.csv
@@ -36,4 +36,3 @@ $ tabcat data.csv
 │    1024 │ e │ ultralongword │
 └─────────┴───┴───────────────┘
 ```
-

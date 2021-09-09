@@ -18,7 +18,7 @@ struct help : argument<app_settings>
 
     std::string_view description() const override
     {
-        return "print this help and quit";
+        return "print this help and exit";
     }
 
     void operator()(app_settings& /*app*/, std::string_view /*val*/) override

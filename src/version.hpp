@@ -22,7 +22,7 @@ struct version : argument<app_settings>
     void operator()(app_settings& app) override
     {
         app.state = app_state::quit_ok;
-        std::cerr << "1.0.0\n";
+        std::cerr << "1.0.1\n";
     }
 };
 

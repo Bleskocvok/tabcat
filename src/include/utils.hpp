@@ -23,6 +23,8 @@ inline void getline_to_str(std::istream& in,
 
 inline void trim(std::string& str);
 
+inline void trim(std::string_view& str);
+
 
 inline bool starts_with(std::string_view str, std::string_view prefix);
 
@@ -61,6 +63,19 @@ void trim(std::string& str)
     }
 
     str.erase(0, last);
+}
+
+
+void trim(std::string_view& str)
+{
+    while (!str.empty() && std::isspace(str.back()))
+    {
+        str.remove_suffix(1);
+    }
+    while (!str.empty() && std::isspace(str.front()))
+    {
+        str.remove_prefix(1);
+    }
 }
 
 

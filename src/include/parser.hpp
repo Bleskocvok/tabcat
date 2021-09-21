@@ -26,9 +26,12 @@ struct parser
         size_t col;
         for (col = 0; (pos = l.find(del)) != std::string_view::npos; col++)
         {
-            func(l.substr(0, pos), col);
+            auto cell = l.substr(0, pos);
+            trim(cell);
+            func(cell, col);
             l.remove_prefix(pos + del.length());
         }
+        trim(l);
         func(l, col);
     }
 };

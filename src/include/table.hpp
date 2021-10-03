@@ -51,7 +51,7 @@ struct error
 class table
 {
     template<typename Self, typename Func>
-    static void for_each_impl(Self self, Func func)
+    static void for_each_impl(Self& self, Func func)
     {
         for (size_t r = 0; r < self.row_count(); r++)
         {

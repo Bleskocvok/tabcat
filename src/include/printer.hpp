@@ -6,9 +6,12 @@
 #include <array>
 #include <iomanip>      // setw
 #include <functional>   // function
+#include <optional>
+#include <unordered_map>
 
 #include "table.hpp"
 #include "terminal.hpp"
+#include "colorize.hpp"
 
 
 enum class border_pos : size_t
@@ -110,6 +113,7 @@ struct printer
 {
     PrintOutput* out;
     print_style style;
+    std::optional<std::unordered_map<std::string, fg_color>> highlights;
 
     printer(PrintOutput& out)
         : out(&out) {}
@@ -168,6 +172,29 @@ struct printer
         *out << style.eol;
     }
 
+    void print_value(const table& tab, std::string_view str, location loc) const
+    {
+        using s = std::string;
+
+        auto align = [&]()
+        {
+            repeat(" ", tab.columns[loc.col].width - unicode_size(str));
+        };
+
+        if (is_numeric(str))
+            align();
+
+        if (!highlights)
+            *out << str;
+        else if (auto it = highlights->find(s(str)); it != highlights->end())
+            *out << colorize(s(str), it->second);
+        else
+            *out << str;
+
+        if (!is_numeric(str))
+            align();
+    }
+
     void print(const table& tab) const
     {
         print(border_pos::top, tab);
@@ -184,9 +211,7 @@ struct printer
                 print(border_pos::del, tab);
             }
 
-            *out << (is_numeric(str) ? std::right : std::left)
-                << std::setw(tab.columns[loc.col].width - size_diff(str))
-                << str;
+            print_value(tab, str, loc);
 
             if (loc.last_col)
             {

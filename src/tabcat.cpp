@@ -17,6 +17,7 @@
 #include "locale.hpp"
 #include "file.hpp"
 #include "output_file.hpp"
+#include "highlight.hpp"
 
 
 void perform_app(const std::vector<std::string_view>& args);
@@ -76,6 +77,7 @@ void perform_app(const std::vector<std::string_view>& args)
     // output style
     app.args.emplace<format>();
     app.args.emplace<output_file>();
+    app.args.emplace<highlight>();
     // borders disabling
     app.args.emplace<disable_border<border_pos::top>>();
     app.args.emplace<disable_border<border_pos::bot>>();
@@ -103,6 +105,7 @@ void perform_app(const std::vector<std::string_view>& args)
 
     app.output->open();
     app.print.output(app.output->ostream());
+
     app.print.print(tab);
     app.output->close();
 }

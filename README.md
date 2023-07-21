@@ -8,11 +8,11 @@ Convert data in CSV format into a neat table.
 Suppose you have data in CSV format, such as this:
 
 ```
-numbers;a;words
-1;b;thing
-40;c;sea
-66;d;car
-1024;e;ultralongword
+numbers,a,words
+1,b,thing
+40,c,sea
+66,d,car
+1024,e,ultralongword
 ```
 
 Using `tabcat` you can arrange it in a nice table.
@@ -20,11 +20,11 @@ The program expects the data either on standard input (`stdin`) or in a file. To
 
 ```shell
 $ cat data.csv
-numbers;a;words
-1;b;thing
-40;c;sea
-66;d;car
-1024;e;ultralongword
+numbers,a,words
+1,b,thing
+40,c,sea
+66,d,car
+1024,e,ultralongword
 
 $ tabcat data.csv
 ┌─────────┬───┬───────────────┐

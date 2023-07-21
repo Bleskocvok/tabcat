@@ -7,7 +7,7 @@
 
 struct parser
 {
-    std::string_view del = ";";
+    std::string_view del = ",";
     std::string_view eol = "\n";
 
     template<typename CellFunc>
